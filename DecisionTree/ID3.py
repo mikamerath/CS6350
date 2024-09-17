@@ -56,23 +56,26 @@ class ID3Tree:
 
 
 def ID3(S, attributes, label, depth):
+    # print(depth)
+    # print(max_depth)
     if len(set(S["label"])) == 1:
         return ID3Tree(S["label"].iloc[0])
     if len(attributes) == 0 or depth == max_depth:
         return ID3Tree(S["label"].mode().iloc[0])
 
     root = ID3Tree(label)
-    split_attribute = get_information_gain(S, attributes, "major_err")
+    # Last arguments should be info_gain, major_err, or gini_index
+    split_attribute = get_information_gain(S, attributes, "gini_index")
     vals = S[split_attribute].unique()
     print(split_attribute)
     print(vals)
     for val in vals:
         subset_examples = S[S[split_attribute] == val]
         if len(subset_examples) == 0:
-            return ID3Tree(S["label"].mode().iloc[0])
+            root.data = ID3Tree(S["label"].mode().iloc[0])
         else:
-            return ID3(
-                subset_examples, attributes - set(split_attribute), val, depth + 1
+            root.children.append(
+                ID3(subset_examples, attributes - {split_attribute}, val, depth + 1)
             )
     return root
 
@@ -134,7 +137,7 @@ def get_information_gain(examples, attributes, method):
 
 df = pd.read_csv(data_path)
 df.columns = all_attributes
-max_depth = 1
+max_depth = 6
 
-result = ID3(df, set(all_attributes[:-1]), "root", 2)
+result = ID3(df, set(all_attributes[:-1]), "root", 0)
 print(result.data)
