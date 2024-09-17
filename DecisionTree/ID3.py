@@ -39,6 +39,8 @@ else:
         "campaign",
         "pdays",
         "previous",
+        "poutcome",
+        "y",
     ]
 
 if train:
@@ -48,26 +50,38 @@ else:
 
 
 class ID3Tree:
-    def __init__(self):
+    def __init__(self, data):
         self.children = []
-        self.data = None
+        self.data = data
 
 
-df = pd.read_csv(data_path)
-df.columns = all_attributes
+def ID3(S, attributes, label, depth):
+    if len(set(S["label"])) == 1:
+        return ID3Tree(S["label"].iloc[0])
+    if len(attributes) == 0 or depth == max_depth:
+        return ID3Tree(S["label"].mode().iloc[0])
 
-
-def ID3(S, attributes, label):
-    split_attribute = get_information_gain(S, attributes, "gini_index")
+    root = ID3Tree(label)
+    split_attribute = get_information_gain(S, attributes, "major_err")
+    vals = S[split_attribute].unique()
     print(split_attribute)
-    return 0
+    print(vals)
+    for val in vals:
+        subset_examples = S[S[split_attribute] == val]
+        if len(subset_examples) == 0:
+            return ID3Tree(S["label"].mode().iloc[0])
+        else:
+            return ID3(
+                subset_examples, attributes - set(split_attribute), val, depth + 1
+            )
+    return root
 
 
 def get_information_gain(examples, attributes, method):
     total_values = len(examples.index)
     all_label_counts = examples.groupby("label").size().to_list()
     best_split = ""
-    best_info_gain = 0
+    best_info_gain = -1
     if method == "info_gain":
         starting_entropy = sum(
             [-x / total_values * math.log2(x / total_values) for x in all_label_counts]
@@ -81,7 +95,7 @@ def get_information_gain(examples, attributes, method):
             [(x / sum(all_label_counts)) ** 2 for x in all_label_counts]
         )
     print(starting_entropy)
-    for attribute in set(all_attributes) - set(attributes) - set(["label"]):
+    for attribute in set(attributes):
         vals = examples[attribute].unique()
         attribute_info_gain = []
         for attribute_val in vals:
@@ -118,4 +132,9 @@ def get_information_gain(examples, attributes, method):
     return best_split
 
 
-ID3(df, [], "unacc")
+df = pd.read_csv(data_path)
+df.columns = all_attributes
+max_depth = 1
+
+result = ID3(df, set(all_attributes[:-1]), "root", 2)
+print(result.data)
