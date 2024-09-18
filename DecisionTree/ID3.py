@@ -1,52 +1,9 @@
 import pandas as pd
 import math
 
-# Set this to which data you want to use (car or bank)
-choice = "car"
-
-# Set true to create the tree, false to test the data
-train = True
-
-# set depth to desired depth of final tree
-depth = 1
-
-if choice == "car":
-    data_path = "car/"
-    all_attributes = [
-        "buying",
-        "maint",
-        "doors",
-        "persons",
-        "lug_boot",
-        "safety",
-        "label",
-    ]
-else:
-    data_path = "bank/"
-    all_attributes = [
-        "age",
-        "job",
-        "marital",
-        "education",
-        "default",
-        "balance",
-        "housing",
-        "loan",
-        "contact",
-        "day",
-        "month",
-        "duration",
-        "campaign",
-        "pdays",
-        "previous",
-        "poutcome",
-        "y",
-    ]
-
-if train:
-    data_path += "train.csv"
-else:
-    data_path += "test.csv"
+attributes_label = ""
+max_depth = 6
+metric = "info_gain"
 
 
 class ID3Tree:
@@ -56,23 +13,20 @@ class ID3Tree:
 
 
 def ID3(S, attributes, label, depth):
-    # print(depth)
-    # print(max_depth)
-    if len(set(S["label"])) == 1:
-        return ID3Tree(S["label"].iloc[0])
+    if len(set(S[attributes_label])) == 1:
+        return ID3Tree(S[attributes_label].iloc[0])
     if len(attributes) == 0 or depth == max_depth:
-        return ID3Tree(S["label"].mode().iloc[0])
+        return ID3Tree(S[attributes_label].mode().iloc[0])
 
     root = ID3Tree(label)
     # Last arguments should be info_gain, major_err, or gini_index
-    split_attribute = get_information_gain(S, attributes, "gini_index")
+    split_attribute = get_information_gain(S, attributes, metric)
     vals = S[split_attribute].unique()
     print(split_attribute)
-    print(vals)
     for val in vals:
         subset_examples = S[S[split_attribute] == val]
         if len(subset_examples) == 0:
-            root.data = ID3Tree(S["label"].mode().iloc[0])
+            root.data = ID3Tree(S[attributes_label].mode().iloc[0])
         else:
             root.children.append(
                 ID3(subset_examples, attributes - {split_attribute}, val, depth + 1)
@@ -82,7 +36,7 @@ def ID3(S, attributes, label, depth):
 
 def get_information_gain(examples, attributes, method):
     total_values = len(examples.index)
-    all_label_counts = examples.groupby("label").size().to_list()
+    all_label_counts = examples.groupby(attributes_label).size().to_list()
     best_split = ""
     best_info_gain = -1
     if method == "info_gain":
@@ -104,7 +58,7 @@ def get_information_gain(examples, attributes, method):
         for attribute_val in vals:
             thing = (
                 examples[examples[attribute] == attribute_val]
-                .groupby("label")
+                .groupby(attributes_label)
                 .size()
                 .to_list()
             )
@@ -133,11 +87,3 @@ def get_information_gain(examples, attributes, method):
             best_info_gain = starting_entropy - sum(attribute_info_gain)
             best_split = attribute
     return best_split
-
-
-df = pd.read_csv(data_path)
-df.columns = all_attributes
-max_depth = 6
-
-result = ID3(df, set(all_attributes[:-1]), "root", 0)
-print(result.data)
