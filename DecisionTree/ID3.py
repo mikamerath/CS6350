@@ -26,19 +26,19 @@ def ID3_prepare(S, attributes, label, depth):
             )
 
     # Comment out for using unknown as a value
-    for attribute in attributes:
-        mode = S_result[attribute].mode()
-        # print(mode)
-        if mode[0] == "unknown":
-            mode = S_result[attribute].value_counts().index.tolist()[1]
-        if mode[0] == "f":
-            S_result[attribute] = S_result[attribute].apply(
-                lambda x: mode if x == "unknown" else x
-            )
-        else:
-            S_result[attribute] = S_result[attribute].apply(
-                lambda x: mode[0] if x == "unknown" else x
-            )
+    # for attribute in attributes:
+    #     mode = S_result[attribute].mode()
+    #     # print(mode)
+    #     if mode[0] == "unknown":
+    #         mode = S_result[attribute].value_counts().index.tolist()[1]
+    #     if mode[0] == "f":
+    #         S_result[attribute] = S_result[attribute].apply(
+    #             lambda x: mode if x == "unknown" else x
+    #         )
+    #     else:
+    #         S_result[attribute] = S_result[attribute].apply(
+    #             lambda x: mode[0] if x == "unknown" else x
+    #         )
 
     return ID3(S_result, attributes, label, depth)
 

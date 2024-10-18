@@ -4,7 +4,7 @@ from pandas.api.types import is_numeric_dtype
 
 import ID3
 
-data_path = "car/"
+# data_path = "car/"
 all_attributes = [
     "buying",
     "maint",
@@ -49,22 +49,22 @@ bank_numerical_attriubues = [
 
 bank_attributes_label = "y"
 
-attributes_map = {k: v for v, k in enumerate(all_attributes)}
-test_data_path = data_path + "test.csv"
-data_path += "train.csv"
+# attributes_map = {k: v for v, k in enumerate(all_attributes)}
+# test_data_path = data_path + "test.csv"
+# data_path += "train.csv"
 
-bank_attributes_map = {k: v for v, k in enumerate(bank_all_attributes)}
-bank_test_data_path = bank_data_path + "test.csv"
-bank_data_path += "train.csv"
+# bank_attributes_map = {k: v for v, k in enumerate(bank_all_attributes)}
+# bank_test_data_path = bank_data_path + "test.csv"
+# bank_data_path += "train.csv"
 
 
-six_trees = []
-sixteen_trees = []
+# six_trees = []
+# sixteen_trees = []
 
-car_df = pd.read_csv(data_path, names=all_attributes)
-car_df.columns = all_attributes
-bank_df = pd.read_csv(bank_data_path, names=bank_all_attributes)
-bank_df.columns = bank_all_attributes
+# car_df = pd.read_csv(data_path, names=all_attributes)
+# car_df.columns = all_attributes
+# bank_df = pd.read_csv(bank_data_path, names=bank_all_attributes)
+# bank_df.columns = bank_all_attributes
 
 # for i in range(1, 7):
 #     df = pd.read_csv(data_path, names=all_attributes)
@@ -73,12 +73,12 @@ bank_df.columns = bank_all_attributes
 #     ID3.metric = "major_err"
 #     six_trees.append(ID3.ID3_prepare(df, set(all_attributes[:-1]), "root", 0))
 
-for i in range(1, 17):
-    df = pd.read_csv(bank_data_path, names=bank_all_attributes)
-    ID3.attributes_label = bank_attributes_label
-    ID3.max_depth = i
-    ID3.metric = "major_err"
-    sixteen_trees.append(ID3.ID3_prepare(df, set(bank_all_attributes[:-1]), "root", 0))
+# for i in range(1, 17):
+#     df = pd.read_csv(bank_data_path, names=bank_all_attributes)
+#     ID3.attributes_label = bank_attributes_label
+#     ID3.max_depth = i
+#     ID3.metric = "major_err"
+#     sixteen_trees.append(ID3.ID3_prepare(df, set(bank_all_attributes[:-1]), "root", 0))
 
 # print(len(six_trees))
 # print(len(sixteen_trees))
@@ -176,36 +176,36 @@ def get_mode_df_col(mode_df, attributes):
 # print(f"Training error {1 - sum(train_error) / len(train_error)}")
 # print(f"Testing error {1 - sum(test_error) / len(test_error)}")
 
-bank_df = convert_df_unknown(bank_df, bank_all_attributes)
-attributes_modes = get_mode_df_col(bank_df, bank_all_attributes[:-1])
-bank_train_error = []
-for tree in sixteen_trees:
-    bank_train_error.append(
-        test_tree(
-            tree,
-            bank_data_path,
-            ["yes", "no"],
-            bank_attributes_map,
-            bank_df,
-            attributes_modes,
-        )
-    )
+# bank_df = convert_df_unknown(bank_df, bank_all_attributes)
+# attributes_modes = get_mode_df_col(bank_df, bank_all_attributes[:-1])
+# bank_train_error = []
+# for tree in sixteen_trees:
+#     bank_train_error.append(
+#         test_tree(
+#             tree,
+#             bank_data_path,
+#             ["yes", "no"],
+#             bank_attributes_map,
+#             bank_df,
+#             attributes_modes,
+#         )
+#     )
 
-bank_test_error = []
-for tree in sixteen_trees:
-    bank_test_error.append(
-        test_tree(
-            tree,
-            bank_test_data_path,
-            ["yes", "no"],
-            bank_attributes_map,
-            bank_df,
-            attributes_modes,
-        )
-    )
+# bank_test_error = []
+# for tree in sixteen_trees:
+#     bank_test_error.append(
+#         test_tree(
+#             tree,
+#             bank_test_data_path,
+#             ["yes", "no"],
+#             bank_attributes_map,
+#             bank_df,
+#             attributes_modes,
+#         )
+#     )
 
-print(f"Training error {1 - sum(bank_train_error) / len(bank_train_error)}")
-print(f"Testing error {1 - sum(bank_test_error) / len(bank_test_error)}")
+# print(f"Training error {1 - sum(bank_train_error) / len(bank_train_error)}")
+# print(f"Testing error {1 - sum(bank_test_error) / len(bank_test_error)}")
 
 # df = pd.read_csv(bank_data_path, names=bank_all_attributes)
 # ID3.attributes_label = bank_attributes_label
