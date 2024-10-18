@@ -16,7 +16,7 @@ class ID3Tree:
         self.data = data
 
 
-def ID3_prepare(S, attributes, label, depth):
+def ID3_prepare(S, attributes, label, depth, forest=False, choices=2):
     S_result = S.copy(deep=True)
     for attribute in attributes:
         if is_numeric_dtype(S_result[attribute]):
@@ -43,7 +43,7 @@ def ID3_prepare(S, attributes, label, depth):
     return ID3(S_result, attributes, label, depth)
 
 
-def ID3(S, attributes, label, depth):
+def ID3(S, attributes, label, depth, forest=False, choices=2):
     if len(list(S[attributes_label].unique())) == 1:
         return ID3Tree(S[attributes_label].iloc[0])
     if len(attributes) == 0 or depth >= max_depth:
@@ -51,7 +51,12 @@ def ID3(S, attributes, label, depth):
 
     root = ID3Tree(label)
     # Last arguments should be info_gain, major_err, or gini_index
-    split_attribute = get_information_gain(S, attributes, metric)
+    if forest:
+        split_attribute = get_information_gain(
+            S, np.random.choice(attributes, choices), metric
+        )
+    else:
+        split_attribute = get_information_gain(S, attributes, metric)
     root.attribute = split_attribute
     vals = S[split_attribute].unique()
     for val in vals:

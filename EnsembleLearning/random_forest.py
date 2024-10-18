@@ -38,6 +38,35 @@ def main():
     prepared_train_df = prepare_test_df(train_df, attributes)
     attributes_map = {k: v for v, k in enumerate(attributes)}
 
+    train_errors = []
+    test_errors = []
+
+    for T in range(1, 10):
+        trees = random_forest(train_df, T, attributes)
+        train_errors.append(
+            1 - predict(trees, prepared_train_df, ["yes", "no"], attributes_map)
+        )
+        test_errors.append(1 - predict(trees, test_df, ["yes", "no"], attributes_map))
+
+    plot_errors(train_errors)
+    plot_errors(test_errors)
+
+
+def random_forest(training_df, T, attributes):
+    ID3.metric = "info_gain"
+    ID3.attributes_label = "y"
+    ID3.max_depth = 16
+    trees = []
+    for i in range(T):
+        samples = training_df.sample(len(training_df), replace=True)
+        trees.append(
+            ID3.ID3_prepare(
+                samples, set(attributes[:-1]), "root", 0, forest=True, choices=2
+            )
+        )
+
+    return trees
+
 
 def prepare_test_df(test_df, attributes):
     result = test_df.copy(deep=True)
@@ -73,3 +102,7 @@ def plot_errors(error_list):
     plt.ylabel("Error")
     plt.plot(range(0, len(error_list)), error_list)
     plt.show()
+
+
+if __name__ == "__main__":
+    main()
